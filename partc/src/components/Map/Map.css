@@ -1,5 +1,5 @@
 .map-wrapper {
-  position: relative; /* מאפשר לכפתור להיות מעל המפה */
+  position: relative;
   height: 100vh;
   width: 100%;
 }
@@ -9,14 +9,19 @@
   width: 100%;
 }
 
-.button {
-  position: absolute;
+.calculate-button {
+  position: absolute; /* make it float on top of the map */
   top: 2rem;
   left: 2rem;
-  z-index: 1000; /* מעל המפה */
-  padding: 0.5rem 1rem;
-  background-color: gray;
+  z-index: 1000; /* ensure it’s above the map */
+  padding: 1rem 2rem;
+  background-color: #007bff;
   color: white;
   border: none;
   border-radius: 1rem;
+  cursor: pointer;
+}
+
+.calculate-button:hover {
+  background-color: #0056b3;
 }
