@@ -1,4 +1,22 @@
-#map {
+.map-wrapper {
+  position: relative; /* מאפשר לכפתור להיות מעל המפה */
+  height: 100vh;
+  width: 100%;
+}
+
+.map-container {
   height: 100%;
   width: 100%;
+}
+
+.button {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  z-index: 1000; /* מעל המפה */
+  padding: 0.5rem 1rem;
+  background-color: gray;
+  color: white;
+  border: none;
+  border-radius: 1rem;
 }

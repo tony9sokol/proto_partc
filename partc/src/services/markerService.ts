@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import L from "leaflet";
 import { popupService } from "./popupService";
 
-export function useMarkers(
+function useMarkers(
   map: L.Map | null,
   positions: [number, number][],
   setPositions: React.Dispatch<React.SetStateAction<[number, number][]>>
@@ -34,3 +34,6 @@ export function useMarkers(
     };
   }, [map, positions]);
 }
+export const markerService = {
+  useMarkers,
+};
