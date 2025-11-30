@@ -1,63 +1,85 @@
-import React, { useEffect, useState } from "react";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-import { markerService } from "../../services/markerService";
+import React, { useState } from "react";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  Polyline,
+} from "react-leaflet";
+import { popupService } from "../../services/popupService";
 import { routeService } from "../../services/routeService";
+import "leaflet/dist/leaflet.css";
 import "./Map.css";
 
 export function Map() {
-  const [map, setMap] = useState<L.Map | null>(null);
   const [markerPositions, setMarkerPositions] = useState<[number, number][]>([
     [32.0853, 34.7818], // Tel Aviv
     [32.794, 34.9896], // Haifa
   ]);
 
-  const [routeLayer, setRouteLayer] = useState<L.Polyline | null>(null);
+  const [routeCoordinates, setRouteCoordinates] = useState<[number, number][]>(
+    []
+  );
 
-  useEffect(() => {
-    const mapInstance = L.map("map").setView(markerPositions[0], 8);
+  const handleCalculateRoute = async () => {
+    if (markerPositions.length < 2) return;
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
-    }).addTo(mapInstance);
-
-    setMap(mapInstance);
-
-    return () => {
-      mapInstance.remove();
-    };
-  }, []);
-
-  markerService.useMarkers(map, markerPositions, setMarkerPositions);
-
-  const handleCalculateRoute = () => {
-    if (!map || markerPositions.length < 2) return;
-
-    // Remove old route if it exists
-    if (routeLayer) {
-      routeLayer.remove();
+    try {
+      const route = await routeService.fetchRoute(
+        markerPositions[0],
+        markerPositions[1]
+      );
+      setRouteCoordinates(route.coordinates);
+    } catch (err) {
+      console.error("Failed to fetch route:", err);
     }
-
-    // Draw new route
-    routeService
-      .fetchRoute(markerPositions[0], markerPositions[1])
-      .then((route: { coordinates: [number, number][] }) => {
-        const polyline = L.polyline(route.coordinates, { color: "blue" }).addTo(
-          map
-        );
-        setRouteLayer(polyline);
-
-        map.fitBounds(polyline.getBounds());
-      })
-      .catch((err) => console.error("Failed to fetch route:", err));
   };
 
   return (
     <div className="map-wrapper">
-      <div id="map" className="map-container" />
-      <button className="button" onClick={handleCalculateRoute}>
-        calculate route{" "}
+      <MapContainer
+        center={markerPositions[0]}
+        zoom={8}
+        className="map-container"
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+        />
+
+        {markerPositions.map((pos, index) => (
+          <Marker
+            key={index}
+            position={pos}
+            draggable
+            eventHandlers={{
+              dragend: (e) => {
+                const newPos = e.target.getLatLng();
+                setMarkerPositions((prev) => {
+                  const updated = [...prev];
+                  updated[index] = [newPos.lat, newPos.lng];
+                  return updated;
+                });
+              },
+            }}
+          >
+            <Popup>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: popupService.getPopupContent(index, pos[0], pos[1]),
+                }}
+              />
+            </Popup>
+          </Marker>
+        ))}
+
+        {routeCoordinates.length > 0 && (
+          <Polyline positions={routeCoordinates} color="blue" />
+        )}
+      </MapContainer>
+
+      <button className="calculate-button" onClick={handleCalculateRoute}>
+        Calculate Route
       </button>
     </div>
   );
