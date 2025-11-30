@@ -1,52 +1,32 @@
 import React, { useEffect, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import  {popupService}  from "../../services/popupService";
+import { useMarkers } from "../../services/markerService";
 import "./Map.css";
 
 export function Map() {
-  const center: [number, number] = [32.0853, 34.7818]; // Tel Aviv
-
-  const [markerPositions, setMarkerPositions] = useState([
+  const [map, setMap] = useState<L.Map | null>(null);
+  const [markerPositions, setMarkerPositions] = useState<[number, number][]>([
     [32.0853, 34.7818], // Tel Aviv
     [32.794, 34.9896], // Haifa
   ]);
 
   useEffect(() => {
-    const map = L.map("map").setView(center, 8);
+    const mapInstance = L.map("map").setView(markerPositions[0], 8);
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
-    }).addTo(map);
+    }).addTo(mapInstance);
 
-    const markers = markerPositions.map((pos, index) => {
-      const marker = L.marker(pos, { draggable: true }).addTo(map);
+    setMap(mapInstance);
 
-      // Use the popup service
-      marker.bindPopup(popupService.getPopupContent(index, pos[0], pos[1]));
-
-      marker.on("dragend", () => {
-        const newPos = marker.getLatLng();
-        setMarkerPositions((prev) => {
-          const updated = [...prev];
-          updated[index] = [newPos.lat, newPos.lng];
-          return updated;
-        });
-
-        marker.setPopupContent(
-          popupService.getPopupContent(index, newPos.lat, newPos.lng)
-        );
-      });
-
-      return marker;
-    });
-
-    // Cleanup function: remove map on unmount
     return () => {
-      map.remove();
+      mapInstance.remove();
     };
-  }, []); // empty deps -> runs once
+  }, []);
+
+  useMarkers(map, markerPositions, setMarkerPositions);
 
   return <div id="map" style={{ height: "100vh", width: "100%" }} />;
 }
