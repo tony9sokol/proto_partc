@@ -1,6 +1,5 @@
 .map-wrapper {
-  position: relative;
-  height: 100vh;
+  height: 100vh; 
   width: 100%;
 }
 
@@ -9,19 +8,91 @@
   width: 100%;
 }
 
+.add-map-button,
+.switch-map-button,
 .calculate-button {
-  position: absolute; /* make it float on top of the map */
-  top: 2rem;
-  left: 2rem;
-  z-index: 1000; /* ensure it’s above the map */
-  padding: 1rem 2rem;
-  background-color: #007bff;
-  color: white;
+  position: absolute;
+  top: 1rem;
+  padding: 0.5rem 1rem;
   border: none;
-  border-radius: 1rem;
+  border-radius: 0.5rem;
+  color: white;
   cursor: pointer;
+  z-index: 1000;
 }
 
+.add-map-button {
+  left: 4rem;
+  background-color: #007bff;
+}
+
+.calculate-button {
+  left: 12rem;
+  background-color: #6c757d;
+}
+
+.add-map-button:hover,
+.switch-map-button:hover,
 .calculate-button:hover {
-  background-color: #0056b3;
+  opacity: 0.8;
+}
+
+.add-layer-modal {
+  position: absolute;
+  top: 4rem;
+  left: 1rem;
+  background-color: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.add-layer-modal input {
+  padding: 0.3rem 0.5rem;
+  border: 0.2rem solid #ccc;
+  border-radius: 0.25rem;
+}
+
+.add-layer-modal button {
+  padding: 0.3rem 0.5rem;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+}
+
+.add-layer-modal button:hover {
+  opacity: 0.8;
+}
+
+.layer-list {
+  position: absolute;
+  top: 4rem;
+  left: 10rem;
+  background-color: white;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  z-index: 1000;
+  box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.3);
+}
+
+.layer-item {
+  padding: 0.3rem 0.5rem;
+  cursor: pointer;
+  border-bottom: 0.2rem solid #eee;
+}
+
+.layer-item:hover {
+  background-color: #f0f0f0;
+}
+.save-button {
+  display: flex;
+  gap: 1rem;
+}
+.error-message {
+  color: red;
 }

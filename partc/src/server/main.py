@@ -17,15 +17,14 @@ app.add_middleware(
 
 
 class RouteRequest(BaseModel):
-    start: Tuple[float, float]  # (lat, lng)
-    end: Tuple[float, float]    # (lat, lng)
+    start: Tuple[float, float]  
+    end: Tuple[float, float]  
 
 class RouteResponse(BaseModel):
-    distance: float             # meters
-    duration: float             # seconds
-    coordinates: List[Tuple[float, float]]  # route polyline
+    distance: float            
+    duration: float             
+    coordinates: List[Tuple[float, float]] 
 
-ORS_API_KEY = "YOUR_ORS_API_KEY"  # replace with your key
 client = openrouteservice.Client(key=API_KEY)
 
 @app.post("/route", response_model=RouteResponse)
@@ -35,8 +34,8 @@ def calculate_route(route: RouteRequest):
     result = client.directions(coords, profile='driving-car', format='geojson')
 
     properties = result['features'][0]['properties']['summary']
-    distance = properties['distance']   # meters
-    duration = properties['duration']   # seconds
+    distance = properties['distance']   
+    duration = properties['duration']   
     geometry = result['features'][0]['geometry']['coordinates']
     coordinates = [(lat, lng) for lng, lat in geometry]
 
