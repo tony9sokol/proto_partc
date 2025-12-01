@@ -6,6 +6,7 @@ import {
   Popup,
   Polyline,
   LayersControl,
+  useMapEvents,
 } from "react-leaflet";
 import { popupService } from "../../services/popupService";
 import { routeService } from "../../services/routeService";
@@ -13,6 +14,20 @@ import { AddLayerForm } from "./AddLayerForm"; // <--- import new form
 import type { MapLayer } from "../../modules/MapLayer";
 import "leaflet/dist/leaflet.css";
 import "./Map.css";
+
+// small component to handle map click
+function MapClickHandler({
+  onClick,
+}: {
+  onClick: (lat: number, lng: number) => void;
+}) {
+  useMapEvents({
+    click(e) {
+      onClick(e.latlng.lat, e.latlng.lng);
+    },
+  });
+  return null;
+}
 
 export function Map() {
   const [markerPositions, setMarkerPositions] = useState<[number, number][]>([
@@ -25,16 +40,32 @@ export function Map() {
   );
   const [mapLayers, setMapLayers] = useState<MapLayer[]>([]);
   const [showAddLayerForm, setShowAddLayerForm] = useState(false);
-
+  const [addingWaypointIndex, setAddingWaypointIndex] = useState<number | null>(
+    null
+  );
+  const getMarkerColor = (index: number, total: number) => {
+    const startHue = 220;
+    const endHue = 180;
+    const hue = startHue + ((endHue - startHue) * index) / (total - 1);
+    return `hsl(${hue}, 100%, 50%)`;
+  };
   const handleCalculateRoute = async () => {
     if (markerPositions.length < 2) return;
+
     try {
-      console.log("hey0000");
-      const route = await routeService.fetchRoute(
-        markerPositions[0],
-        markerPositions[1]
-      );
-      setRouteCoordinates(route.coordinates);
+      let fullRoute: [number, number][] = [];
+
+      for (let i = 0; i < markerPositions.length - 1; i++) {
+        const start = markerPositions[i];
+        const end = markerPositions[i + 1];
+
+        const segment = await routeService.fetchRoute(start, end);
+        const coordsToAdd =
+          i === 0 ? segment.coordinates : segment.coordinates.slice(1);
+        fullRoute = fullRoute.concat(coordsToAdd);
+      }
+
+      setRouteCoordinates(fullRoute);
     } catch (err) {
       console.error("Failed to fetch route:", err);
     }
@@ -45,8 +76,40 @@ export function Map() {
     setShowAddLayerForm(false);
   };
 
+  const handleMapClick = (lat: number, lng: number) => {
+    if (addingWaypointIndex === null) return;
+    const newMarkers = [...markerPositions];
+    newMarkers.splice(addingWaypointIndex + 1, 0, [lat, lng]); // insert after clicked index
+    setMarkerPositions(newMarkers);
+    setAddingWaypointIndex(null); // reset
+  };
+
   return (
     <div className="map-wrapper">
+      <div className="waypoints-sidebar">
+        <h3>Waypoints</h3>
+        <ul>
+          {markerPositions.map((pos, index) => (
+            <li key={index}>
+              {index === 0
+                ? "Source"
+                : index === markerPositions.length - 1
+                ? "Target"
+                : `Waypoint ${index}`}
+              : {pos[0].toFixed(4)}, {pos[1].toFixed(4)}{" "}
+              {index < markerPositions.length - 1 && (
+                <button
+                  className="add-waypoint-button"
+                  onClick={() => setAddingWaypointIndex(index)}
+                >
+                  Add Waypoint
+                </button>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+
       <MapContainer
         center={markerPositions[0]}
         zoom={8}
@@ -70,7 +133,7 @@ export function Map() {
             position={pos}
             draggable
             eventHandlers={{
-              dragend: (e) => {
+              drag: (e) => {
                 const newPos = e.target.getLatLng();
                 setMarkerPositions((prev) => {
                   const updated = [...prev];
@@ -93,6 +156,9 @@ export function Map() {
         {routeCoordinates.length > 0 && (
           <Polyline positions={routeCoordinates} color="blue" />
         )}
+
+        {/* Map click handler */}
+        <MapClickHandler onClick={handleMapClick} />
       </MapContainer>
 
       <div className="map-buttons">
