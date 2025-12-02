@@ -1,11 +1,13 @@
 import { useEffect } from "react";
+import type { Dispatch, SetStateAction } from "react";
+
 import L from "leaflet";
 import { popupService } from "./popupService";
 
 function useMarkers(
   map: L.Map | null,
   positions: [number, number][],
-  setPositions: React.Dispatch<React.SetStateAction<[number, number][]>>
+  setPositions: Dispatch<SetStateAction<[number, number][]>> // explicit import
 ) {
   useEffect(() => {
     if (!map) return;
