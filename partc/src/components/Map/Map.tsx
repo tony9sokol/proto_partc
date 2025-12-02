@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import  {popupService}  from "../../services/popupService";
 import "./Map.css";
-import * as utm from "utm";
 
 export function Map() {
-  const center: [number, number] = [32.0853, 34.7818];
+  const center: [number, number] = [32.0853, 34.7818]; // Tel Aviv
 
   const [markerPositions, setMarkerPositions] = useState([
     [32.0853, 34.7818], // Tel Aviv
@@ -13,7 +13,7 @@ export function Map() {
   ]);
 
   useEffect(() => {
-    const map = L.map("map").setView(center, 4);
+    const map = L.map("map").setView(center, 8);
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution:
@@ -22,17 +22,10 @@ export function Map() {
 
     const markers = markerPositions.map((pos, index) => {
       const marker = L.marker(pos, { draggable: true }).addTo(map);
-      const utmCoords = utm.fromLatLon(pos[0], pos[1]);
 
-      marker.bindPopup(
-        `Marker ${index + 1}<br>Lat: ${pos[0].toFixed(
-          4
-        )}, Lng: ${pos[1].toFixed(4)} , UTM: Zone ${utmCoords.zoneNum}${
-          utmCoords.zoneLetter
-        }, Easting: ${utmCoords.easting.toFixed(
-          2
-        )}, Northing: ${utmCoords.northing.toFixed(2)}`
-      );
+      // Use the popup service
+      marker.bindPopup(popupService.getPopupContent(index, pos[0], pos[1]));
+
       marker.on("dragend", () => {
         const newPos = marker.getLatLng();
         setMarkerPositions((prev) => {
@@ -40,25 +33,20 @@ export function Map() {
           updated[index] = [newPos.lat, newPos.lng];
           return updated;
         });
-        const newUtm = utm.fromLatLon(newPos.lat, newPos.lng);
 
         marker.setPopupContent(
-          `Marker ${index + 1}<br>
-           Lat: ${newPos.lat.toFixed(4)}, Lng: ${newPos.lng.toFixed(4)}<br>
-           UTM: Zone ${newUtm.zoneNum}${
-            newUtm.zoneLetter
-          }, Easting: ${newUtm.easting.toFixed(
-            2
-          )}, Northing: ${newUtm.northing.toFixed(2)}`
+          popupService.getPopupContent(index, newPos.lat, newPos.lng)
         );
       });
 
       return marker;
     });
 
+    // Cleanup function: remove map on unmount
     return () => {
       map.remove();
     };
-  }, []);
+  }, []); // empty deps -> runs once
+
   return <div id="map" style={{ height: "100vh", width: "100%" }} />;
 }
