@@ -6,7 +6,7 @@ interface Props {
   onCancel: () => void;
 }
 
-export function AddLayerForm({ onSaveLayer, onCancel }: Props) {
+export const AddLayerForm = ({ onSaveLayer, onCancel }: Props) => {
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
   const [error, setError] = useState("");
@@ -40,10 +40,11 @@ export function AddLayerForm({ onSaveLayer, onCancel }: Props) {
         onChange={(e) => setUrl(e.target.value)}
       />
       {error && <div className="error-message">{error}</div>}
+
       <div className="save-button">
         <button onClick={handleSave}>Save Layer</button>
         <button onClick={onCancel}>Cancel</button>
       </div>
     </div>
   );
-}
+};
