@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
+from pydantic import BaseModel,Field
 from typing import Tuple, List
 import openrouteservice
 from ..config.api import API_KEY
@@ -15,17 +15,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+class Coordinate(BaseModel):
+    lat: float = Field(..., ge=-90, le=90)
+    lng: float = Field(..., ge=-180, le=180)
 
 class RouteRequest(BaseModel):
-    start: Tuple[float, float]  # (lat, lng)
-    end: Tuple[float, float]    # (lat, lng)
+    start: Coordinate
+    end: Coordinate  
 
 class RouteResponse(BaseModel):
-    distance: float             # meters
-    duration: float             # seconds
-    coordinates: List[Tuple[float, float]]  # route polyline
+    distance: float             
+    duration: float           
+    coordinates: List[Tuple[float, float]]  
 
-ORS_API_KEY = "YOUR_ORS_API_KEY"  # replace with your key
 client = openrouteservice.Client(key=API_KEY)
 
 @app.post("/route", response_model=RouteResponse)
