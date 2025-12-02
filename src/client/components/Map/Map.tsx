@@ -72,9 +72,9 @@ export function Map() {
   const handleMapClick = (lat: number, lng: number) => {
     if (addingWaypointIndex === null) return;
     const newMarkers = [...markerPositions];
-    newMarkers.splice(addingWaypointIndex + 1, 0, [lat, lng]); 
+    newMarkers.splice(addingWaypointIndex + 1, 0, [lat, lng]);
     setMarkerPositions(newMarkers);
-    setAddingWaypointIndex(null); 
+    setAddingWaypointIndex(null);
   };
 
   return (

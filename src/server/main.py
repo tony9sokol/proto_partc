@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Tuple, List
 import openrouteservice
-from ..config.api import API_KEY
+from .config.api import API_KEY
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Route API")
