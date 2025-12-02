@@ -15,7 +15,6 @@ import type { MapLayer } from "../../modules/MapLayer";
 import "leaflet/dist/leaflet.css";
 import "./Map.css";
 
-// small component to handle map click
 function MapClickHandler({
   onClick,
 }: {
@@ -43,12 +42,6 @@ export function Map() {
   const [addingWaypointIndex, setAddingWaypointIndex] = useState<number | null>(
     null
   );
-  const getMarkerColor = (index: number, total: number) => {
-    const startHue = 220;
-    const endHue = 180;
-    const hue = startHue + ((endHue - startHue) * index) / (total - 1);
-    return `hsl(${hue}, 100%, 50%)`;
-  };
   const handleCalculateRoute = async () => {
     if (markerPositions.length < 2) return;
 
@@ -79,9 +72,9 @@ export function Map() {
   const handleMapClick = (lat: number, lng: number) => {
     if (addingWaypointIndex === null) return;
     const newMarkers = [...markerPositions];
-    newMarkers.splice(addingWaypointIndex + 1, 0, [lat, lng]); // insert after clicked index
+    newMarkers.splice(addingWaypointIndex + 1, 0, [lat, lng]); 
     setMarkerPositions(newMarkers);
-    setAddingWaypointIndex(null); // reset
+    setAddingWaypointIndex(null); 
   };
 
   return (

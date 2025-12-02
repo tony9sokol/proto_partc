@@ -1,4 +1,3 @@
-// components/Map/AddLayerForm.tsx
 import React, { useState } from "react";
 import type { MapLayer } from "../../modules/MapLayer";
 
