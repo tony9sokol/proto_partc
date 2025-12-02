@@ -4,7 +4,7 @@ import type { Dispatch, SetStateAction } from "react";
 import L from "leaflet";
 import { popupService } from "./popupService";
 
-export function useMarkers(
+function useMarkers(
   map: L.Map | null,
   positions: [number, number][],
   setPositions: Dispatch<SetStateAction<[number, number][]>> // explicit import
@@ -36,3 +36,6 @@ export function useMarkers(
     };
   }, [map, positions]);
 }
+export const markerService = {
+  useMarkers,
+};

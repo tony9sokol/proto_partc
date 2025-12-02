@@ -6,16 +6,16 @@
   "scripts": {
     "dev": "concurrently \"npm run dev:react\" \"npm run dev:server\"",
     "dev:react": "vite",
-    "dev:server": "python -m uvicorn server.main:app --reload",
+    "dev:server": "python -m uvicorn src.server.main:app --reload",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
     "leaflet": "^1.9.4",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "react-leaflet": "^5.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-leaflet": "^4.2.1",
     "utm": "^1.1.1"
   },
   "devDependencies": {
@@ -35,4 +35,3 @@
     "vite": "^7.2.4"
   }
 }
-  

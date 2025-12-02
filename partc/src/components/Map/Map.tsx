@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { useMarkers } from "../../services/markerService";
+import { markerService } from "../../services/markerService";
+import { routeService } from "../../services/routeService";
 import "./Map.css";
 
 export function Map() {
@@ -10,6 +11,8 @@ export function Map() {
     [32.0853, 34.7818], // Tel Aviv
     [32.794, 34.9896], // Haifa
   ]);
+
+  const [routeLayer, setRouteLayer] = useState<L.Polyline | null>(null);
 
   useEffect(() => {
     const mapInstance = L.map("map").setView(markerPositions[0], 8);
@@ -26,7 +29,36 @@ export function Map() {
     };
   }, []);
 
-  useMarkers(map, markerPositions, setMarkerPositions);
+  markerService.useMarkers(map, markerPositions, setMarkerPositions);
 
-  return <div id="map" style={{ height: "100vh", width: "100%" }} />;
+  const handleCalculateRoute = () => {
+    if (!map || markerPositions.length < 2) return;
+
+    // Remove old route if it exists
+    if (routeLayer) {
+      routeLayer.remove();
+    }
+
+    // Draw new route
+    routeService
+      .fetchRoute(markerPositions[0], markerPositions[1])
+      .then((route: { coordinates: [number, number][] }) => {
+        const polyline = L.polyline(route.coordinates, { color: "blue" }).addTo(
+          map
+        );
+        setRouteLayer(polyline);
+
+        map.fitBounds(polyline.getBounds());
+      })
+      .catch((err) => console.error("Failed to fetch route:", err));
+  };
+
+  return (
+    <div className="map-wrapper">
+      <div id="map" className="map-container" />
+      <button className="button" onClick={handleCalculateRoute}>
+        calculate route{" "}
+      </button>
+    </div>
+  );
 }
