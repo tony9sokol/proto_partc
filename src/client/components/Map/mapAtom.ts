@@ -11,6 +11,11 @@ export const routeCoordinatesAtom = atom<Coordinate[]>([]);
 
 export const mapLayersAtom = atom<MapLayer[]>([]);
 
-export const polygonCoordsAtom = atom<Coordinate[]>([]);
-
+// Last drawn polygon via PM
 export const drawnPolygonAtom = atom<Coordinate[] | null>(null);
+
+// Polygons added via text input
+export const inputPolygonsAtom = atom<Coordinate[][]>([]);
+
+// Single polygon coordinates (optional, could be merged later)
+export const polygonCoordsAtom = atom<Coordinate[]>([]);
