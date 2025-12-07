@@ -52,6 +52,15 @@ export const Map = () => {
   const [showAddLayerForm, setShowAddLayerForm] = React.useState(false);
   const [isAddingWaypoint, setIsAddingWaypoint] = React.useState(false);
 
+  const handlePolygonChange = (coords: Coordinate[]) => {
+    setDrawnPolygon(coords);
+    setPolygonCoordinatesList((prev) => {
+      const updated = [...prev];
+      updated[prev.length - 1] = coords;
+      return updated;
+    });
+  };
+
   const handleCalculateRoute = async () => {
     if (markerPositions.length < 2) return;
 
@@ -171,11 +180,7 @@ export const Map = () => {
             ))}
           </LayersControl>
 
-          <DrawPolygon
-            onPolygonChange={(coords: Coordinate[]) =>
-              setPolygonCoordinatesList((prev) => [...prev, coords])
-            }
-          />
+          <DrawPolygon onPolygonChange={handlePolygonChange} />
 
           {polygonCoordinatesList.map((poly, idx) => (
             <Polygon
